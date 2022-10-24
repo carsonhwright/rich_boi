@@ -1,0 +1,4 @@
+requests
+prettytable
+html
+pandas

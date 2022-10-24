@@ -130,3 +130,5 @@ dmypy.json
 
 # Private
 private_resources.json
+output/*.txt
+output/*.csv
