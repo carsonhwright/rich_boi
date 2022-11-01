@@ -92,7 +92,8 @@ def get_daily_data():
     """
 
 def pull_test_batch():
-    test_series = ['CUSR0000SA0']
+    test_series = ['CUSR0000SA0', 'CUSR0000SAC', 'CUSR0000SAH', 
+        'CUSR0000SAM', 'CUSR0000SAN1D']
     # , 'CUSR0000SA0L12E4', 'CUSR0000SAC']
     get_api_pd_batch_data(test_series)
     # get_api_constrained_batch_data(test_series)
@@ -109,11 +110,15 @@ def get_api_pd_batch_data(series_ids):
     
     for series_id in series_ids:
 
-        start_year = str(series_general_df.iloc[np.where(series_general_df["series_id"] == series_id)]["begin_year"][0] + 40)
+        # start_year = str(series_general_df.iloc[np.where(series_general_df["series_id"] == series_id)]["begin_year"][0] + 40)
         # start_year = "2011"
         # end_year = "2014"
         series_id_list_obj = [series_id]
-        end_year = str(series_general_df.iloc[np.where(series_general_df["series_id"] == series_id)]["end_year"][0])
+        try:
+            end_year = str(series_general_df.iloc[np.where(series_general_df["series_id"] == series_id)]["end_year"].values[0])
+        except KeyError:
+            breakpoint()
+        start_year = str(int(end_year) - 10)
         data = json.dumps({"seriesid": series_id_list_obj,"startyear": start_year, "endyear": end_year})
 
         # now similarly as I did with the batches of requests, I need to batch the number of years requested
@@ -124,8 +129,7 @@ def get_api_pd_batch_data(series_ids):
 
         json_data = json.loads(proc.text)
         try:
-            breakpoint()
-            data = json_data["data"]
+            data = json_data["Results"]["series"][0]["data"]
             for item in data: item["series_id"]=series_id
             df = pd.DataFrame(data=data)
             df.to_csv(f'output/{series_id}.csv', index=None)
