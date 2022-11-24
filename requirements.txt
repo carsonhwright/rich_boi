@@ -3,3 +3,5 @@ prettytable
 html
 pandas
 matplotlib
+numpy
+ipykernel

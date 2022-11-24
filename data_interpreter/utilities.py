@@ -10,22 +10,29 @@ def get_df(series_id):
     return df
 
 def basic_plot(df):
-    df2 = pd.DataFrame(df, columns=['year', 'periodName'])
-
-    for i in df2.values:
-        breakpoint()
-        i["datetime"] = datetime.datetime(str(i["year"].values[0]), str(i["periodName"].values[0]))
-    df.plot()
+    df2 = pd.DataFrame(df, columns=['datetime', 'value'])
+    plt.plot(df2["datetime"], df2["value"])
+    plt.show()
 
 def set_datetime_df(df):
     month_names = calendar.month_name[:]
-    breakpoint()
-    df["datetime"] = datetime.datetime(df["year"], month_names.index(df["periodName"]))
-    # THIS DOESN'T WORK YET, SEE:
-    # https://towardsdatascience.com/create-new-column-based-on-other-columns-pandas-5586d87de73d#:~:text=98%20False%2098.1-,Using%20apply()%20method,method%20should%20do%20the%20trick.
+    df["datetime"] = df.apply(
+        lambda row: datetime.datetime(year=row["year"], month=month_names.index(row["periodName"]),day=1), 
+        axis=1
+        )
+    return df
+
+def get_df_from_list(series_list):
+    series_dict = {}
+    for series_id in series_list:
+        filename = Path(f"output/{series_id}.csv")
+        series_dict[series_id] = pd.read_csv(filename)
+    return series_dict
 
 def main():
-    df = get_df('CUSR0000SA0')
-    set_datetime_df(df)
-    breakpoint()
-    basic_plot(df)
+    test_series = ['CUSR0000SA0', 'CUSR0000SAC', 'CUSR0000SAH', 
+        'CUSR0000SAM', 'CUSR0000SAN1D']
+    series_dict = get_df_from_list(test_series)
+    series_example = series_dict["CUSR0000SA0"]
+    date_time_df = set_datetime_df(series_example)
+    basic_plot(series_example)

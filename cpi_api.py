@@ -1,11 +1,18 @@
 import requests
 import json, re, time
-import prettytable
+# import prettytable
 import pandas as pd
 import numpy as np
 
+import data_interpreter.utilities as ut
+
 REQUEST_LIMIT = 25
 DAILY_QUERY_LIMIT = 500
+
+"""
+What should the purpose of this API be? just to construct the data set? If so, then this needs to
+stop at writing CSVs
+"""
 
 def set_series_data():
     """"""
@@ -33,55 +40,6 @@ def get_series_data_list():
         series_data_list.append(id)
     return series_data_list
 
-def get_api_constrained_batch_data(series_ids):
-    """
-    This will request batches of CPI series data, 25 (or whatever REQUEST_LIMIT) at a time. And
-    will wait 10s between requests. This doesn't work exactly as I would like, because there also
-    exists a 500 per day query limit. This will have to be accommodated for as well. See 
-    get_daily_data().
-    """
-    headers = {'Content-type': 'application/json'}
-    num_series_ids = len(series_ids)
-    series_batch_list = []
-    num_full_batches = int(num_series_ids / REQUEST_LIMIT)
-    remainder = num_series_ids % REQUEST_LIMIT
-    batch_index = 0
-    for full_batch in range(num_full_batches):
-        series_batch_list.append(series_ids[batch_index:(batch_index+REQUEST_LIMIT-1)])
-        batch_index = batch_index + REQUEST_LIMIT
-    series_batch_list.append(series_ids[len(series_ids)-remainder-1:])
-    for series_batch in series_batch_list:
-        data = json.dumps({"seriesid": series_batch,"startyear":"2011", "endyear":"2014"})
-        p = requests.post('https://api.bls.gov/publicAPI/v2/timeseries/data/', data=data, headers=headers)
-        json_data = json.loads(p.text)
-        breakpoint()
-        # THIS HAS NOT BEEN IMPLEMENTED YET, RIGHT NOW THIS ONLY PROVIDES THE IDS THAT THE API SHOULD BE
-        # REQUESTING: the data variable will need to be changed or perhaps removed and the 'p' variable
-        # perhaps should request all data and use the series ids to create new data sets individually
-        # this will likely get huge
-        try:
-            for series in json_data['Results']['series']:
-                x=prettytable.PrettyTable(["series id","year","period","value","footnotes"])
-                seriesId = series['seriesID']
-                for item in series['data']:
-                    year = item['year']
-                    period = item['period']
-                    value = item['value']
-                    footnotes=""
-                    for footnote in item['footnotes']:
-                        if footnote:
-                            footnotes = footnotes + footnote['text'] + ','
-                    if 'M01' <= period <= 'M12':
-                        x.add_row([seriesId,year,period,value,footnotes[0:-1]])
-                output = open(f'output/{seriesId}' + '.txt','w')
-                output.write (x.get_string())
-                output.close()
-        except KeyError:
-            print(f"[KeyError] Failed to parse series file in batch: {series_batch}")
-            time.sleep(10)
-            continue
-        time.sleep(10)
-
 def get_daily_data():
     """
     Dept. of Labor has a daily limit on how many requests I can make = DAILY_REQUEST_LIMIT, this 
@@ -94,9 +52,7 @@ def get_daily_data():
 def pull_test_batch():
     test_series = ['CUSR0000SA0', 'CUSR0000SAC', 'CUSR0000SAH', 
         'CUSR0000SAM', 'CUSR0000SAN1D']
-    # , 'CUSR0000SA0L12E4', 'CUSR0000SAC']
     get_api_pd_batch_data(test_series)
-    # get_api_constrained_batch_data(test_series)
 
 def get_api_pd_batch_data(series_ids):
     """
