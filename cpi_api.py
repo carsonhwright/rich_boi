@@ -1,13 +1,15 @@
 import requests
 import json, re, time
-# import prettytable
+from pathlib import Path
 import pandas as pd
 import numpy as np
+import calendar, datetime
 
 import data_interpreter.utilities as ut
 
 REQUEST_LIMIT = 25
 DAILY_QUERY_LIMIT = 500
+SERIES_ID_TABLE = Path("output/series_id_table.csv")
 
 """
 What should the purpose of this API be? just to construct the data set? If so, then this needs to
@@ -48,11 +50,31 @@ def get_daily_data():
     NOTE: Perhaps the series_id_table.csv should also have a column in it of when it was last
         updated and when each individual series was pulled.
     """
+    # Update the series basic data (like most recent period, start period, new series IDs etc)
+    set_series_data()
+    base_series_data = pd.read_csv(SERIES_ID_TABLE, on_bad_lines='skip')
+
+    # Verify which series are still missing data, based on what's in the series_id_table
+    for series in base_series_data["series_id"]:
+        if Path(f"output/{series}.csv").exists():
+            """needs to verify that it has data from start to end periods"""
+        else:
+            """The file does not exist, need to make a new pull"""
+
+
+    # update and overwrites data files, make sure it allows NaN values for data to be written later
+
 
 def pull_test_batch():
     test_series = ['CUSR0000SA0', 'CUSR0000SAC', 'CUSR0000SAH', 
         'CUSR0000SAM', 'CUSR0000SAN1D']
     get_api_pd_batch_data(test_series)
+    series_dict = ut.get_df_from_list(test_series)
+    for id, series_data in series_dict.items():
+        df_to_write = ut.set_datetime_df(series_data)
+        df_to_write.to_csv(f'output/{id}.csv', index=None)
+
+
 
 def get_api_pd_batch_data(series_ids):
     """
@@ -71,9 +93,11 @@ def get_api_pd_batch_data(series_ids):
         # end_year = "2014"
         series_id_list_obj = [series_id]
         try:
+            # TODO: This also needs to be dependent on what the present ending period is for a pre-existant file
             end_year = str(series_general_df.iloc[np.where(series_general_df["series_id"] == series_id)]["end_year"].values[0])
         except KeyError:
             breakpoint()
+        # TODO: This needs to also be dependent on the actual first period as well
         start_year = str(int(end_year) - 10)
         data = json.dumps({"seriesid": series_id_list_obj,"startyear": start_year, "endyear": end_year})
 
@@ -92,6 +116,6 @@ def get_api_pd_batch_data(series_ids):
         except KeyError:
             print(f"[KeyError] Failed to parse series file: {series_id}")
             time.sleep(5)
+
 def main():
-    series_ids = get_series_data_list()
-    get_api_constrained_batch_data(series_ids)
+    """I will probably get rid of this eventually, retaining for dbugging"""

@@ -29,7 +29,12 @@ def get_df_from_list(series_list):
         series_dict[series_id] = pd.read_csv(filename)
     return series_dict
 
+""" I don't know if the following is necessary, retaining for now"""
+# def overwrite_series_from_df(df):
+#     with open()
+
 def main():
+    """ Only retaining for dbugging purposes"""
     test_series = ['CUSR0000SA0', 'CUSR0000SAC', 'CUSR0000SAH', 
         'CUSR0000SAM', 'CUSR0000SAN1D']
     series_dict = get_df_from_list(test_series)
