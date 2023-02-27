@@ -76,7 +76,7 @@ def pull_test_batch():
 
 
 
-def get_api_pd_batch_data(series_ids):
+def get_api_pd_batch_data(series_ids:list):
     """
     This will request batches of CPI series data, 25 (or whatever REQUEST_LIMIT) at a time. And
     will wait 10s between requests. This doesn't work exactly as I would like, because there also

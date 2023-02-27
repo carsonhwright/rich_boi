@@ -132,3 +132,5 @@ dmypy.json
 private_resources.json
 output/*.txt
 output/*.csv
+output/*.png
+.ipynb
