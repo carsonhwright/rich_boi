@@ -1,0 +1,3 @@
+[submodule "reddit"]
+	path = reddit
+	url = https://github.com/reddit/reddit.git

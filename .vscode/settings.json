@@ -1,3 +1,13 @@
 {
-    "python.pythonPath": "C:\\ProgramData\\Miniconda3\\envs\\web-scraper\\python.exe"
+    "python.pythonPath": "C:\\ProgramData\\Miniconda3\\envs\\web-scraper\\python.exe",
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+          {
+            "scope": "meta.function-call.generic.python",
+            "settings": {
+              "foreground": "#DCDCAA"
+            }
+          }
+        ]
+      }
 }

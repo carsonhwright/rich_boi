@@ -3,7 +3,7 @@ from ..utils import get_private_res
 # Some other example server values are
 # server = 'localhost\sqlexpress' # for a named instance
 # server = 'myserver,port' # to specify an alternate port
-server = 'localhost\\PYTEST' 
+server = 'CARSONPC' 
 database = 'PYTEST' 
 username = get_private_res("local_db_user") 
 password = get_private_res("local_db_pw")
