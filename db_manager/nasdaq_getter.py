@@ -12,7 +12,7 @@ end_date = dt.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d")
 mydata = ndl.get("WIKI/FB", start_date="2021-01-01", end_date=end_date)
 breakpoint()
 
-
+# sort of, data stops in 2019, could be used for historical analysis
 ###############################################################################
 ########################### PAYWALL DEADEND ###################################
 ###############################################################################
